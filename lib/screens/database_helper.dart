@@ -489,46 +489,66 @@ Future<void> cloneAndReplacePurchaseTable() async {
   }
 }
 
-  Future<int> insertProductData(Map<String, dynamic> data) async {
-    Database db = await database;
-    return await db.insert(productTableName, data, conflictAlgorithm: ConflictAlgorithm.replace);
-  }
-
-  Future<int> updateProductName(String newName, String oldName) async {
-    Database db = await database;
-    return await db.rawUpdate(
-      'UPDATE $productTableName SET name = ? WHERE name = ?',
-      [newName, oldName],
-    );
-  }
-
-    Future<void> removeProduct(String productName) async {
-    Database db = await database;
-    await db.delete(
-      productTableName,
-      where: 'name = ?',
-      whereArgs: [productName],
-    );
-  }
-
-Future<List<String>> getProductNames() async {
+Future<int> getTotalSales(String productName) async {
   try {
     Database db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(productTableName);
-    List<String> namesList = List.generate(maps.length, (i) {
-      return maps[i]['name'] as String;
-    });
+    List<Map<String, dynamic>> sales = await db.query(
+      salesTableName,
+      where: '$productName > 0', // Assuming the column value > 0 means sales occurred for the product
+    );
 
-    print('Fetched product names: $namesList');
-    return namesList;
+    int totalSales = 0;
+
+    //print('Sales for $productName: $sales');
+
+    for (Map<String, dynamic> sale in sales) {
+      sale.forEach((key, value) {
+        if (key != 'serial' && key != 'date' && value is int && value > 0) {
+          totalSales += value;
+          //print('Adding $value to totalSales. Current totalSales: $totalSales');
+        }
+      });
+    }
+
+    //print('Final total sales for $productName: $totalSales');
+
+    return totalSales;
   } catch (e) {
-    print('Error fetching product names: $e');
-    return []; // Return an empty list in case of error
+    //print('Error in getTotalSales: $e');
+    // Handle or log the error as needed
+    return 0; // Return a default value
   }
 }
 
+Future<int> getTotalPurchase(String productName) async {
+  try {
+    Database db = await database;
+    List<Map<String, dynamic>> purchases = await db.query(
+      purchaseTableName,
+      where: '$productName > 0', // Assuming the column value > 0 means purchases occurred for the product
+    );
 
+    int totalPurchases = 0;
 
+    //print('Purchases for $productName: $purchases');
 
+    for (Map<String, dynamic> purchase in purchases) {
+      purchase.forEach((key, value) {
+        if (key != 'serial' && key != 'date' && value is int && value > 0) {
+          totalPurchases += value;
+          //print('Adding $value to totalPurchases. Current totalPurchases: $totalPurchases');
+        }
+      });
+    }
+
+    //print('Final total purchases for $productName: $totalPurchases');
+
+    return totalPurchases;
+  } catch (e) {
+    //print('Error in getTotalPurchase: $e');
+    // Handle or log the error as needed
+    return 0; // Return a default value
+  }
+}
 }
 

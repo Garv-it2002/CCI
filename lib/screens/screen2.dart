@@ -58,6 +58,7 @@ class _Screen2State extends State<Screen2> {
         title: Text(widget.isSheet1Active
             ? 'Details for ${widget.selectedProduct} in Purchase'
             : 'Details for ${widget.selectedProduct} in Sales'),
+            
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

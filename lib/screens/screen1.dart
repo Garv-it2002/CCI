@@ -6,30 +6,28 @@ import 'database_helper.dart';
 import 'sales_screen.dart';
 import 'package:intl/intl.dart';
 import 'purchase_screen.dart';
-import 'product_screen.dart';
+import 'analysis.dart';
 class Screen1 extends StatefulWidget {
   @override
   _Screen1State createState() => _Screen1State();
 }
 
 class _Screen1State extends State<Screen1> {
-  final dbHelper = DatabaseHelper();
-  List<String> products = [];
+  List<String> products = [
+    "20mm SM", "16mm SM", "12mm SM", "10mm SM", "8mm SM", "20mm AS",
+    "16mm AS", "12mm AS", "10mm AS", "8mm AS",
+    "Local Wire", "Tata Wire", "Cover block", "Patiya", "Ch 2.2K", "6mm TMT", "6mm ring",
+    "5mm", "2mm", "Weight", "Garter 4K", "Garter 3K", "Garter 2.5K", "Tee 2.7",
+    "Tee 2.2", "AL 50/6", "AL 40/6", "AL 35/6", "AL 35/5", "AL 25/3"
+  ];
   List<String> filteredProducts = [];
   List<Map<String, dynamic>> tableData = [];
   bool isSheet1Active = false;
 
   @override
   void initState() {
-    fetchData();
     filteredProducts = products;
     super.initState();
-  }
-
-    Future<void> fetchData() async {
-    products = await dbHelper.getProductNames();
-    filteredProducts = List.from(products);
-    setState(() {}); // Trigger a rebuild after fetching data
   }
 
   ThemeData _getTheme() {
@@ -131,7 +129,7 @@ Future<void> saveDataToDatabase() async {
  void navigateToProductScreen() {
    Navigator.push(
      context,
-     MaterialPageRoute(builder: (context) => ProductScreen()),
+     MaterialPageRoute(builder: (context) => AnalysisScreen()),
    );
  }
 
@@ -169,9 +167,12 @@ Future<void> saveDataToDatabase() async {
           IconButton(
             onPressed: navigateToProductScreen,
             icon: Icon(Icons.inventory),
+            tooltip: 'Analysis',
           ),
+          const SizedBox(width: 30),
           ],
         ),
+        
         body: Row(
           children: [
             Expanded(

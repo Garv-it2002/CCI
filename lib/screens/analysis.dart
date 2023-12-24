@@ -10,9 +10,9 @@ class AnalysisScreen extends StatefulWidget {
 
 class _AnalysisScreenState extends State<AnalysisScreen> {
     ScrollController _scrollController = ScrollController();
-  Map<String, int> totalSales = {};
-  Map<String, int> totalPurchase = {};
-  Map<String, int> stockLeft = {};
+  Map<String, double> totalSales = {};
+  Map<String, double> totalPurchase = {};
+  Map<String, double> stockLeft = {};
   late List<Map<String, dynamic>> products;
 
   @override
@@ -22,11 +22,11 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
   }
 
 Widget _buildSalesColumnChart() {
-  List<charts.Series<MapEntry<String, int>, String>> series = [
-    charts.Series<MapEntry<String, int>, String>(
+  List<charts.Series<MapEntry<String, double>, String>> series = [
+    charts.Series<MapEntry<String, double>, String>(
       id: 'Sales',
-      domainFn: (MapEntry<String, int> sales, _) => sales.key,
-      measureFn: (MapEntry<String, int> sales, _) => sales.value,
+      domainFn: (MapEntry<String, double> sales, _) => sales.key,
+      measureFn: (MapEntry<String, double> sales, _) => sales.value,
       data: totalSales.entries.map((entry) => MapEntry(entry.key, entry.value)).toList(),
       colorFn: (_, __) => charts.ColorUtil.fromDartColor(Colors.orange), // Change color to orange
     ),
@@ -76,11 +76,11 @@ void exportTables() async {
 //.........................
 
 Widget _buildPurchaseColumnChart() {
-  List<charts.Series<MapEntry<String, int>, String>> series = [
-    charts.Series<MapEntry<String, int>, String>(
+  List<charts.Series<MapEntry<String, double>, String>> series = [
+    charts.Series<MapEntry<String, double>, String>(
       id: 'Purchase',
-      domainFn: (MapEntry<String, int> purchase, _) => purchase.key,
-      measureFn: (MapEntry<String, int> purchase, _) => purchase.value,
+      domainFn: (MapEntry<String, double> purchase, _) => purchase.key,
+      measureFn: (MapEntry<String, double> purchase, _) => purchase.value,
       data: totalPurchase.entries.map((entry) => MapEntry(entry.key, entry.value)).toList(),
       colorFn: (_, __) => charts.ColorUtil.fromDartColor(Colors.blue), // Change color to blue
     ),
@@ -123,8 +123,8 @@ Widget _buildPurchaseColumnChart() {
         String productName = product['name'] as String;
         productName = '[${productName.replaceAll(' ', '_')}]';
         //print(productName);
-        int sales = await DatabaseHelper().getTotalSales(productName);
-        int purchase = await DatabaseHelper().getTotalPurchase(productName);
+        double sales = await DatabaseHelper().getTotalSales(productName);
+        double purchase = await DatabaseHelper().getTotalPurchase(productName);
 
         setState(() {
           totalSales[productName] = sales;
@@ -137,16 +137,16 @@ Widget _buildPurchaseColumnChart() {
     }
   }
 
-  int calculateTotalSales() {
-  int sum = 0;
+  double calculateTotalSales() {
+  double sum = 0;
   totalSales.forEach((key, value) {
     sum += value;
   });
   return sum;
 }
 
-  int calculateTotalPurchase() {
-  int sum = 0;
+  double calculateTotalPurchase() {
+  double sum = 0;
   totalPurchase.forEach((key, value) {
     sum += value;
   });

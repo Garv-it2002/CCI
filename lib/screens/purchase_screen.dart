@@ -131,7 +131,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
         ),
         body: productNames.isEmpty || purchaseData.isEmpty
             ? const Center(
-                child: CircularProgressIndicator(),
+                child: Text("No data available"),
               )
             : Scrollbar(
                 controller: verticalScrollController,

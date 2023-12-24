@@ -489,66 +489,43 @@ Future<void> cloneAndReplacePurchaseTable() async {
   }
 }
 
-Future<int> getTotalSales(String productName) async {
+Future<double> getTotalSales(String productName) async {
   try {
     Database db = await database;
-    List<Map<String, dynamic>> sales = await db.query(
-      salesTableName,
-      where: '$productName > 0', // Assuming the column value > 0 means sales occurred for the product
+
+    // Use SQLite SUM function to sum up values in the specified column
+    List<Map<String, dynamic>> result = await db.rawQuery(
+      'SELECT TOTAL($productName) AS totalSales FROM $salesTableName'
     );
 
-    int totalSales = 0;
-
-    //print('Sales for $productName: $sales');
-
-    for (Map<String, dynamic> sale in sales) {
-      sale.forEach((key, value) {
-        if (key != 'serial' && key != 'date' && value is int && value > 0) {
-          totalSales += value;
-          //print('Adding $value to totalSales. Current totalSales: $totalSales');
-        }
-      });
-    }
-
-    //print('Final total sales for $productName: $totalSales');
+    // Extract the total sales value from the result
+    double totalSales = (result[0]['totalSales'] ?? 0) as double;
 
     return totalSales;
   } catch (e) {
-    //print('Error in getTotalSales: $e');
     // Handle or log the error as needed
-    return 0; // Return a default value
+    return 0.0; // Return a default value
   }
 }
 
-Future<int> getTotalPurchase(String productName) async {
+Future<double> getTotalPurchase(String productName) async {
   try {
     Database db = await database;
-    List<Map<String, dynamic>> purchases = await db.query(
-      purchaseTableName,
-      where: '$productName > 0', // Assuming the column value > 0 means purchases occurred for the product
+
+    // Use SQLite SUM function to sum up values in the specified column
+    List<Map<String, dynamic>> result = await db.rawQuery(
+      'SELECT TOTAL($productName) AS totalPurchase FROM $purchaseTableName'
     );
 
-    int totalPurchases = 0;
+    // Extract the total sales value from the result
+    double totalpurchase = (result[0]['totalPurchase'] ?? 0) as double;
 
-    //print('Purchases for $productName: $purchases');
-
-    for (Map<String, dynamic> purchase in purchases) {
-      purchase.forEach((key, value) {
-        if (key != 'serial' && key != 'date' && value is int && value > 0) {
-          totalPurchases += value;
-          //print('Adding $value to totalPurchases. Current totalPurchases: $totalPurchases');
-        }
-      });
-    }
-
-    //print('Final total purchases for $productName: $totalPurchases');
-
-    return totalPurchases;
+    return totalpurchase;
   } catch (e) {
-    //print('Error in getTotalPurchase: $e');
     // Handle or log the error as needed
-    return 0; // Return a default value
+    return 0.0; // Return a default value
   }
 }
+
 }
 

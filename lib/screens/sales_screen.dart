@@ -137,7 +137,7 @@ class _SalesScreenState extends State<SalesScreen> {
         ),
         body: productNames.isEmpty || salesData.isEmpty
             ? const Center(
-                child: CircularProgressIndicator(),
+                child: Text("No data available"),
               )
             : Scrollbar(
                 controller: verticalScrollController,

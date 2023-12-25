@@ -34,10 +34,14 @@ class _Screen2State extends State<Screen2> {
     rateController = TextEditingController();
     weightFocusNode = FocusNode();
     rateFocusNode = FocusNode();
+    weightController.addListener(calculateTotal);
+    rateController.addListener(calculateTotal);
   }
 
   @override
   void dispose() {
+    weightController.removeListener(calculateTotal);
+    rateController.removeListener(calculateTotal);
     weightController.dispose();
     rateController.dispose();
     weightFocusNode.dispose();
@@ -130,6 +134,9 @@ class _Screen2State extends State<Screen2> {
               child: const Text('Insert into the table'),
             ),
             const SizedBox(height: 30),
+            Text('Current total: ${calculateTotal().toString()}', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 20),
+            Text('Value to database: ${weightController.text}', style: const TextStyle(fontWeight: FontWeight.bold)),
           ],
         ),
       ),

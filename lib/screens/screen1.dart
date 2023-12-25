@@ -98,19 +98,38 @@ Future<void> saveDataToDatabase() async {
   String date = DateFormat('dd-MM-yyyy').format(currentDate); // Format date as dd-mm-yyyy
 
   Map<String, dynamic> allData = {'date': date}; // Include the date in the combined data
+
   for (var data in tableData) {
     String productName = data['name'];
     double weight = data['weight'] ?? 0.0;
 
     // Use square brackets to handle product names with spaces and replace spaces with underscores
-    allData['[${productName.replaceAll(' ', '_')}]'] = weight;
+    String formattedProductName = '[${productName.replaceAll(' ', '_')}]';
+
+    // Check if the product name already exists in allData
+    if (allData.containsKey(formattedProductName)) {
+      // If exists, insert the existing data and reset allData
+      isSheet1Active
+          ? await dbHelper.insertPurchaseData(allData)
+          : await dbHelper.insertSalesData(allData);
+      
+      // Clear allData to continue adding remaining entries
+      allData.clear();
+      allData['date'] = date; // Re-add the date entry
+    }
+
+    // Add or update the entry for the product
+    allData[formattedProductName] = weight;
   }
 
-  isSheet1Active 
-      ? await dbHelper.insertPurchaseData(allData)
-      : await dbHelper.insertSalesData(allData);
-
+  // Insert any remaining data after the loop
+  if (allData.isNotEmpty) {
+    isSheet1Active
+        ? await dbHelper.insertPurchaseData(allData)
+        : await dbHelper.insertSalesData(allData);
+  }
 }
+
 
     void navigateToSalesScreen() {
     Navigator.push(
@@ -236,7 +255,7 @@ Future<void> saveDataToDatabase() async {
                     const SizedBox(width: 300, height: 20),
                     Expanded(
                       child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
+                        scrollDirection: Axis.vertical,
                         child: DataTable(
                           columns: const [
                             DataColumn(label: Text('Name')),
@@ -282,7 +301,7 @@ Future<void> saveDataToDatabase() async {
                           ],
                         ),
                       ),
-                    ),
+                      ),
                     const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: tableData.isNotEmpty ? () async {

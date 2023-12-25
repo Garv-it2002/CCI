@@ -16,9 +16,9 @@ class _Screen1State extends State<Screen1> {
   List<String> products = [
     "20mm SM", "16mm SM", "12mm SM", "10mm SM", "8mm SM", "20mm AS",
     "16mm AS", "12mm AS", "10mm AS", "8mm AS",
-    "Local Wire", "Tata Wire", "Cover block", "Patiya", "Ch 2.2K", "6mm TMT", "6mm ring",
-    "5mm", "2mm", "Weight", "Garter 4K", "Garter 3K", "Garter 2.5K", "Tee 2.7",
-    "Tee 2.2", "AL 50/6", "AL 40/6", "AL 35/6", "AL 35/5", "AL 25/3"
+    "Local Wire", "Tata Wire", "Cover block", "Ch 2.2K", "Labour", "6mm TMT", "6mm ring",
+    "5mm", "Cutting", "Weight", "Patiya", "Gate(L)", "Gate(H)", "Gate(P)", "Jangla", "Garter 4K", "Garter 3K", "Garter 2.5K", "Tee 2.7",
+    "Tee 2.2", "AL 50/6", "AL 40/6", "AL 35/5", "AL 32/3", "AL 25/3"
   ];
   List<String> filteredProducts = [];
   List<Map<String, dynamic>> tableData = [];
@@ -81,14 +81,14 @@ class _Screen1State extends State<Screen1> {
     return totalWeight;
   }
 
-        double calculateTotalTotal() {
-    double totalWeight = 0.0;
+    int calculateTotalTotal() {
+    double totalWeight = 0;
     for (var data in tableData) {
       if (data['total'] != null) {
         totalWeight += data['total'];
       }
     }
-    return totalWeight;
+    return totalWeight.floor().toInt();
   }
 
 Future<void> saveDataToDatabase() async {
@@ -274,7 +274,7 @@ Future<void> saveDataToDatabase() async {
                               const DataCell(Text("")),
                               const DataCell(Text("")),
                               DataCell(Text(
-                                calculateTotalTotal().toStringAsFixed(2),
+                                calculateTotalTotal().toStringAsFixed(0),
                                 style: const TextStyle(fontWeight: FontWeight.bold),                                 
                               )),
                               const DataCell(Text('')),

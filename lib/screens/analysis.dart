@@ -230,7 +230,7 @@ Expanded(
     ),
     child: Center(
       child: Text(
-        'Total Purchase: \$${calculateTotalSales()}',
+        'Total Sales: \₹${calculateTotalSales()}',
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 25.0,
@@ -250,7 +250,7 @@ Expanded(
     ),
     child: Center(
       child: Text(
-        'Total Purchase: \$${calculateTotalPurchase()}',
+        'Total Purchase: \₹${calculateTotalPurchase()}',
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 25.0,

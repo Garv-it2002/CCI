@@ -21,7 +21,7 @@ class Screen2 extends StatefulWidget {
 class _Screen2State extends State<Screen2> {
   double weight = 0.0;
   double rate = 0.0;
-  double total = 0.0;
+  int total = 0;
   late TextEditingController weightController;
   late TextEditingController rateController;
   late FocusNode weightFocusNode;
@@ -45,10 +45,18 @@ class _Screen2State extends State<Screen2> {
     super.dispose();
   }
 
-  void calculateTotal() {
+  int calculateTotal() {
     setState(() {
-      total = (weight * rate).roundToDouble();
+      double value = (double.tryParse(weightController.text) ?? 0.0) *(double.tryParse(rateController.text) ?? 0.0);
+      int roundedValue;
+          if (value >= 0) {
+            roundedValue = (value + 0.5).floor();
+          } else {
+            roundedValue = (value - 0.5).ceil();
+          }
+      total=roundedValue;
     });
+    return total;
   }
 
   @override
@@ -95,13 +103,12 @@ class _Screen2State extends State<Screen2> {
                 border: OutlineInputBorder(),
               ),
               onSubmitted: (_) {
-                calculateTotal();
+                //calculateTotal();
                 Map<String, dynamic> newData = {
                   'name': widget.selectedProduct,
                   'weight': double.tryParse(weightController.text) ?? 0.0,
                   'rate': double.tryParse(rateController.text) ?? 0.0,
-                  'total': (double.tryParse(weightController.text) ?? 0.0) *
-                      (double.tryParse(rateController.text) ?? 0.0),
+                  'total': calculateTotal(),
                 };
                 widget.onSave(newData);
                 Navigator.pop(context);
@@ -110,13 +117,12 @@ class _Screen2State extends State<Screen2> {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                calculateTotal();
+                //calculateTotal();
                 Map<String, dynamic> newData = {
                   'name': widget.selectedProduct,
                   'weight': double.tryParse(weightController.text) ?? 0.0,
                   'rate': double.tryParse(rateController.text) ?? 0.0,
-                  'total': (double.tryParse(weightController.text) ?? 0.0) *
-                      (double.tryParse(rateController.text) ?? 0.0),
+                  'total': calculateTotal(),
                 };
                 widget.onSave(newData);
                 Navigator.pop(context);

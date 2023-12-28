@@ -12,11 +12,12 @@ Future<void> exportSalesDataToExcel(List<Map<String, dynamic>> salesData, List<S
   Excel excel = Excel.createExcel();
   Sheet sheetObject = excel['Sheet1']; // Create a new sheet
   // Add headers for columns
-  sheetObject.appendRow(['Serial', 'Date', ...productNames]);
+  sheetObject.appendRow(['Serial', 'Invoice', 'Date', ...productNames]);
   // Add data rows
   salesData.forEach((data) {
     List<dynamic> rowData = [
       num.tryParse(data['serial']?.toString() ?? '0') ?? 0, // Convert serial to number, export null as '0'
+      num.tryParse(data['invoice']),
       data['date'] is DateTime ? DateFormat('yyyy-MM-dd').format(data['date']) : data['date'].toString(), // Date format if it's a DateTime object
       for (var productName in productNames)
         data[productName.replaceAll(' ', '_')] != null

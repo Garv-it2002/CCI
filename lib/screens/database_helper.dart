@@ -40,8 +40,8 @@ Future<Database> initDatabase() async {
       List<String> initialProductNames = [
     "20mm SM", "16mm SM", "12mm SM", "10mm SM", "8mm SM", "20mm AS",
     "16mm AS", "12mm AS", "10mm AS", "8mm AS",
-    "Local Wire", "Tata Wire", "Cover block", "Ch 2.2K", "Labour", "6mm TMT", "6mm ring",
-    "5mm", "Cutting", "Weight", "Patiya", "Gate(L)", "Gate(H)", "Gate(P)", "Jangla", "Garter 4K", "Garter 3K", "Garter 2.5K", "Tee 2.7",
+    "Local Wire", "Tata Wire", "Cover block", "Ch 2.2K", "6mm TMT", "6mm ring",
+    "5mm", "Patiya", "Gate(L)", "Gate(H)", "Gate(P)", "Jangla", "Garter 4K", "Garter 3K", "Garter 2.5K", "Tee 2.7",
     "Tee 2.2", "AL 50/6", "AL 40/6", "AL 35/5", "AL 32/3", "AL 25/3"
   ];
 
@@ -53,6 +53,7 @@ Future<Database> initDatabase() async {
     await db.execute('''
       CREATE TABLE $salesTableName (
         serial INTEGER PRIMARY KEY AUTOINCREMENT,
+        invoice TEXT,
         date TEXT,
         ${initialProductNames.map((name) => '[${name.replaceAll(' ', '_')}] INTEGER').join(',')}
       )
@@ -62,6 +63,7 @@ Future<Database> initDatabase() async {
     await db.execute('''
       CREATE TABLE $purchaseTableName (
         serial INTEGER PRIMARY KEY AUTOINCREMENT,
+        invoice TEXT,
         date TEXT,
         ${initialProductNames.map((name) => '[${name.replaceAll(' ', '_')}] INTEGER').join(',')}
       )
@@ -169,7 +171,7 @@ Future<void> saveChanges(List<Map<String, dynamic>> updatedSalesData) async {
 Future<bool> aggregateSalesOldData(BuildContext context) async {
   try {
     Database db = await database;
-    DateTime tenDaysAgo = DateTime.now().subtract(const Duration(days: 10));
+    DateTime tenDaysAgo = DateTime.now().subtract(const Duration(days: 31));
 
     String formattedDate = '${tenDaysAgo.day.toString().padLeft(2, '0')}-${tenDaysAgo.month.toString().padLeft(2, '0')}-${tenDaysAgo.year}';
 
@@ -186,6 +188,8 @@ Future<bool> aggregateSalesOldData(BuildContext context) async {
       );
       return false; // Directly return false if only one entry is available
     }
+
+    
 
     DateTime? mostRecentDate;
     if (oldSalesEntries.isNotEmpty) {
@@ -212,7 +216,7 @@ Future<bool> aggregateSalesOldData(BuildContext context) async {
     void combineSalesEntries(List<Map<String, dynamic>> entries) {
       entries.forEach((entry) {
         entry.forEach((key, value) {
-          if (key != 'date' && key != 'serial') {
+          if (key != 'date' && key != 'serial' && key != "invoice") {
             String formattedKey = '[$key]';
             combinedSalesEntries[formattedKey] =
                 (combinedSalesEntries[formattedKey] ?? 0) + (value ?? 0);
@@ -233,6 +237,7 @@ bool updatesMade = await db.transaction((txn) async {
       String latestDateQuery = '''
         SELECT MAX(date) AS latest_date FROM sales_table
         ''';
+      
 
       List<Map<String, dynamic>> latestDateResult = await txn.rawQuery(latestDateQuery);
       String? latestDate =
@@ -246,6 +251,7 @@ bool updatesMade = await db.transaction((txn) async {
 
     if (existingRow.isNotEmpty) {
       combinedSalesEntries['date'] = formattedMostRecentDate;
+      combinedSalesEntries['invoice'] = "0";
       // Update the existing row with combinedSalesEntries values
       await txn.update(
         'sales_table',
@@ -321,7 +327,7 @@ Future<bool> aggregatePurchaseOldData(BuildContext context) async {
     void combinePurchaseEntries(List<Map<String, dynamic>> entries) {
       entries.forEach((entry) {
         entry.forEach((key, value) {
-          if (key != 'date' && key != 'serial') {
+          if (key != 'date' && key != 'serial' && key != "invoice") {
             String formattedKey = '[$key]';
             combinedPurchaseEntries[formattedKey] =
                 (combinedPurchaseEntries[formattedKey] ?? 0) + (value ?? 0);
@@ -524,6 +530,22 @@ Future<double> getTotalPurchase(String productName) async {
     // Handle or log the error as needed
     return 0.0; // Return a default value
   }
+}
+
+Future<void> updatePurchaseInvoice(String invoiceNumber) async {
+  final Database db = await database;
+  await db.rawUpdate(
+    'UPDATE $purchaseTableName SET invoice = ?',
+    [invoiceNumber],
+  );
+}
+
+Future<void> updateSalesInvoice(String invoiceNumber) async {
+  final Database db = await database;
+  await db.rawUpdate(
+    'UPDATE $salesTableName SET invoice = ?',
+    [invoiceNumber],
+  );
 }
 
 }

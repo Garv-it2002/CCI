@@ -7,6 +7,7 @@ import 'sales_screen.dart';
 import 'package:intl/intl.dart';
 import 'purchase_screen.dart';
 import 'analysis.dart';
+import 'patiya.dart';
 class Screen1 extends StatefulWidget {
   @override
   _Screen1State createState() => _Screen1State();
@@ -44,7 +45,22 @@ class _Screen1State extends State<Screen1> {
     });
   }
 
-  void navigateToScreen2(String selectedProduct) {
+void navigateToScreen2(String selectedProduct) {
+  if (selectedProduct == 'Patiya') {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => Patiya(
+          selectedProduct: "Patiya",
+          onSave: (data) {
+            setState(() {
+              tableData.add(data);
+            });
+          },
+          isSheet1Active: isSheet1Active,
+      )
+      ),
+    );
+  } else {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -60,26 +76,28 @@ class _Screen1State extends State<Screen1> {
       ),
     );
   }
- 
-    double calculateTotalWeight() {
-    double totalWeight = 0.0;
-    for (var data in tableData) {
-      if (data['weight'] != null) {
-        totalWeight += data['weight'];
-      }
-    }
-    return totalWeight;
-  }
+}
 
-      double calculateTotalRate() {
-    double totalWeight = 0.0;
-    for (var data in tableData) {
-      if (data['rate'] != null) {
-        totalWeight += data['rate'];
-      }
-    }
-    return totalWeight;
-  }
+ 
+ //  double calculateTotalWeight() {
+ //  double totalWeight = 0.0;
+ //  for (var data in tableData) {
+ //    if (data['weight'] != null) {
+ //      totalWeight += data['weight'];
+ //    }
+ //  }
+ //  return totalWeight;
+ //}
+
+ //    double calculateTotalRate() {
+ //  double totalWeight = 0.0;
+ //  for (var data in tableData) {
+ //    if (data['rate'] != null) {
+ //      totalWeight += data['rate'];
+ //    }
+ //  }
+ //  return totalWeight;
+ //}
 
     int calculateTotalTotal() {
     double totalWeight = 0;
@@ -91,44 +109,124 @@ class _Screen1State extends State<Screen1> {
     return totalWeight.floor().toInt();
   }
 
-Future<void> saveDataToDatabase() async {
+Future<void> saveDataToDatabase(String? enteredInvoice, String? entereddate) async {
   DatabaseHelper dbHelper = DatabaseHelper();
+  //DateTime currentDate = DateTime.now();
+  String? date = entereddate;
+  String? invoice = enteredInvoice;
+  //print(invoice);
 
-  DateTime currentDate = DateTime.now();
-  String date = DateFormat('dd-MM-yyyy').format(currentDate); // Format date as dd-mm-yyyy
-
-  Map<String, dynamic> allData = {'date': date}; // Include the date in the combined data
+  Map<String, dynamic> allData = {'date': date, 'invoice': invoice}; // Include the date in the combined data
 
   for (var data in tableData) {
+    double weight = 0.0;
     String productName = data['name'];
-    double weight = data['weight'] ?? 0.0;
-
-    // Use square brackets to handle product names with spaces and replace spaces with underscores
-    String formattedProductName = '[${productName.replaceAll(' ', '_')}]';
-
-    // Check if the product name already exists in allData
-    if (allData.containsKey(formattedProductName)) {
-      // If exists, insert the existing data and reset allData
-      isSheet1Active
-          ? await dbHelper.insertPurchaseData(allData)
-          : await dbHelper.insertSalesData(allData);
-      
-      // Clear allData to continue adding remaining entries
-      allData.clear();
-      allData['date'] = date; // Re-add the date entry
+    //print(productName);
+    if (productName == 'Patiya') {
+      //print('lol');
+      String n_wt = data['weight'].toString();
+      //print(n_wt);
+            // Use square brackets to handle product names with spaces and replace spaces with underscores
+      RegExp regex = RegExp(r"(\d+(\.\d+)?)\s?\(");
+      String text = n_wt; // Assuming the number is in the 'name' field
+      Match? match = regex.firstMatch(text);
+      if (match != null) {
+        String matchedValue = match.group(1)!;
+        double parsedValue = double.parse(matchedValue);
+        //print(parsedValue);
+        weight = parsedValue;
+      }
+    }
+    else{
+      weight = data['weight'];
     }
 
-    // Add or update the entry for the product
-    allData[formattedProductName] = weight;
+    if (productName != 'Cutting' && productName != 'Labour' && productName != 'Weight') { // Exclude 'Cutting' and 'Labour'
+      // Use square brackets to handle product names with spaces and replace spaces with underscores
+      String formattedProductName = '[${productName.replaceAll(' ', '_')}]';
+      // Check if the product name already exists in allData
+      if (allData.containsKey(formattedProductName)) {
+        // If exists, accumulate the weight for the product name
+        allData[formattedProductName] = (allData[formattedProductName] ?? 0.0) + weight;
+      } else {
+        // Add the entry for the product with its weight
+        allData[formattedProductName] = weight;
+      }
+    }
   }
 
-  // Insert any remaining data after the loop
+  // Insert the accumulated data after the loop
   if (allData.isNotEmpty) {
     isSheet1Active
         ? await dbHelper.insertPurchaseData(allData)
         : await dbHelper.insertSalesData(allData);
   }
 }
+
+Future<Map<String, String>?> _showInvoiceDialog() async {
+  TextEditingController _invoiceController = TextEditingController();
+  TextEditingController _dateController =
+      TextEditingController(text: DateFormat('dd-MM-yyyy').format(DateTime.now()));
+
+  Map<String, String>? result;
+
+  result = await showDialog<Map<String, String>>(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Enter Invoice Details'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              controller: _dateController,
+              decoration: InputDecoration(hintText: 'Enter Date (dd-MM-yyyy)'),
+            ),
+            TextField(
+              controller: _invoiceController,
+              decoration: InputDecoration(hintText: 'Enter Invoice Number'),
+            ),
+          ],
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: Text('Submit'),
+            onPressed: () {
+              String invoiceNumber = _invoiceController.text;
+              String enteredDate = _dateController.text;
+
+              // Date validation
+              if (RegExp(r'^\d{2}-\d{2}-\d{4}$').hasMatch(enteredDate)) {
+                // Valid date format (dd-MM-yyyy)
+                Navigator.of(context, rootNavigator: true).pop({
+                  'invoiceNumber': invoiceNumber,
+                  'enteredDate': enteredDate,
+                });
+              } else {
+                // Invalid date format
+                // You can show an error message or handle it accordingly
+                // For simplicity, here it returns null if the date format is invalid
+                Navigator.of(context, rootNavigator: true).pop(null);
+              }
+            },
+          ),
+          TextButton(
+            child: Text('Cancel'),
+            onPressed: () {
+              Navigator.of(context, rootNavigator: true).pop(null);
+            },
+          ),
+        ],
+      );
+    },
+  );
+
+  return result;
+}
+
+
+
 
 
     void navigateToSalesScreen() {
@@ -304,12 +402,20 @@ Future<void> saveDataToDatabase() async {
                       ),
                     const SizedBox(height: 20),
                     ElevatedButton(
-                      onPressed: tableData.isNotEmpty ? () async {
-                        await saveDataToDatabase();
-                        setState(() {
-                          tableData.clear();
-                        });
-                      } : null, // Disable onPressed if tableData is empty
+                      onPressed: tableData.isNotEmpty
+                          ? () async {
+                              Map<String, String>? result = await _showInvoiceDialog();
+                              //if (enteredInvoice != null) {
+                              if (result != null && result['invoiceNumber'] != null && result['enteredDate'] != null) {
+                                  String? enteredInvoice = result['invoiceNumber']!;
+                                  String? enteredDate = result['enteredDate']!;
+                                await saveDataToDatabase(enteredInvoice, enteredDate);
+                              setState(() {
+                                tableData.clear();
+                              });
+                              }
+                            }
+                          : null, // Disable onPressed if tableData is empty
                       child: const Text('Save'),
                     ),
                   ],

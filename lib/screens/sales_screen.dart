@@ -163,6 +163,7 @@ class _SalesScreenState extends State<SalesScreen> {
                       child: DataTable(
                         columns: [
                           const DataColumn(label: Text('Serial')),
+                          const DataColumn(label: Text('Invoice')), // Date column
                           const DataColumn(label: Text('Date')), // Date column
                           for (var productName in productNames)
                             DataColumn(
@@ -172,6 +173,18 @@ class _SalesScreenState extends State<SalesScreen> {
                           List<DataCell> cells = [
                             DataCell(
                               Text(data['serial'].toString()), // Display serial number
+                            ),
+                            DataCell(
+                              isEditing
+                                  ? TextFormField(
+                                      initialValue: data['invoice']?.toString() ?? 'null',
+                                      onChanged: (newValue) {
+                                        setState(() {
+                                          data['invoice'] = newValue; // Update the 'date' value
+                                        });
+                                      },
+                                    )
+                                  : Text(data['invoice']?.toString() ?? 'null'),
                             ),
                             DataCell(
                               isEditing

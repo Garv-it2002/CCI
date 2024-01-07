@@ -38,10 +38,10 @@ Future<Database> initDatabase() async {
       ''');
 
       List<String> initialProductNames = [
-    "20mm SM", "16mm SM", "12mm SM", "10mm SM", "8mm SM", "20mm AS",
-    "16mm AS", "12mm AS", "10mm AS", "8mm AS",
-    "Local Wire", "Tata Wire", "Cover block", "Ch 2.2K", "6mm TMT", "6mm ring",
-    "5mm", "Patiya", "Gate(L)", "Gate(H)", "Gate(P)", "Jangla", "Garter 4K", "Garter 3K", "Garter 2.5K", "Tee 2.7",
+    "20mm SM", "16mm SM", "12mm SM", "10mm SM", "8mm SM", "16mm AS",
+    "12mm AS", "10mm AS", "8mm AS", "6mm TMT",
+    "Local Wire", "Tata Wire", "Cover block", "Ch 2.2K", "Labour", "Tape", "6mm ring",
+    "5mm", "Cutting", "Weight", "Patiya", "Gate(L)", "Gate(H)", "Gate(P)", "Jangla", "Garter 4K", "Garter 3K", "Garter 2.5K", "Tee 2.7",
     "Tee 2.2", "AL 50/6", "AL 40/6", "AL 35/5", "AL 32/3", "AL 25/3"
   ];
 
@@ -504,7 +504,9 @@ Future<double> getTotalSales(String productName) async {
     );
 
     // Extract the total sales value from the result
-    double totalSales = (result[0]['totalSales'] ?? 0) as double;
+    
+    double tSales = (result[0]['totalSales'] ?? 0) as double;
+    double totalSales = double.parse(tSales.toStringAsFixed(2));
 
     return totalSales;
   } catch (e) {
@@ -523,6 +525,7 @@ Future<double> getTotalPurchase(String productName) async {
     );
 
     // Extract the total sales value from the result
+    double tPurchase = (result[0]['totalPurchase'] ?? 0) as double;
     double totalpurchase = (result[0]['totalPurchase'] ?? 0) as double;
 
     return totalpurchase;

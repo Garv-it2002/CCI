@@ -142,7 +142,8 @@ Widget _buildPurchaseColumnChart() {
   totalSales.forEach((key, value) {
     sum += value;
   });
-  return sum;
+  double fsum = double.parse(sum.toStringAsFixed(2));
+  return fsum;
 }
 
   double calculateTotalPurchase() {
@@ -150,7 +151,8 @@ Widget _buildPurchaseColumnChart() {
   totalPurchase.forEach((key, value) {
     sum += value;
   });
-  return sum;
+  double fsum = double.parse(sum.toStringAsFixed(2));
+  return fsum;
 }
 
    final snackBar = const SnackBar(

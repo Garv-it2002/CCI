@@ -5,19 +5,21 @@ Cloud Commerce Intelligence (CCI) is an innovative, cloud-based platform designe
 ## Table of Contents
 
 - [Introduction](#introduction)
+- [Architecture](#architecture)
 - [Features](#features)
 - [Technology Stack](#technology-stack)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
-- [Contact](#contact)
 
 ## Introduction
 
 The 21st century has witnessed rapid urbanization and digitalization, which has opened up a new market for the online economy, producing opportunities and enhancing competitiveness. The **Cloud Commerce Intelligence (CCI)** platform leverages the power of cloud computing and AI to enable MSMEs, a critical part of the Indian economy, to thrive amid growing competition, especially in urban hubs.
 
 CCI’s philosophy is to provide MSMEs with the tools to streamline operations, reduce waste, and adopt sustainable practices that help them compete with larger enterprises. CCI integrates state-of-the-art technologies to create a platform that is scalable, cost-effective, and easy to use, empowering MSMEs to sustain and grow in a rapidly evolving market.
+
+## Architecture
+
+![Blank diagram (4)](https://github.com/user-attachments/assets/d98dd9b1-c927-4ad5-9947-aa7641207a02)
 
 ## Features
 

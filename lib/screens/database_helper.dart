@@ -37,13 +37,7 @@ Future<Database> initDatabase() async {
         )
       ''');
 
-      List<String> initialProductNames = [
-    "20mm SM", "16mm SM", "12mm SM", "10mm SM", "8mm SM", "16mm AS",
-    "12mm AS", "10mm AS", "8mm AS", "6mm TMT",
-    "Local Wire", "Tata Wire", "Cover block", "Ch 2.2K", "Labour", "Tape", "6mm ring",
-    "5mm", "Cutting", "Weight", "Patiya", "Gate(L)", "Gate(H)", "Gate(P)", "Jangla", "Garter 4K", "Garter 3K", "Garter 2.5K", "Tee 2.7",
-    "Tee 2.2", "AL 50/6", "AL 40/6", "AL 35/5", "AL 32/3", "AL 25/3"
-  ];
+      List<String> initialProductNames = [];
 
       for (String productName in initialProductNames) {
         await db.insert(productTableName, {'name': productName});
